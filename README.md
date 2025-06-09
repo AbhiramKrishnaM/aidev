@@ -11,6 +11,10 @@ An AI-powered command-line assistant for developers that provides code generatio
 - **API Testing**: Test and format API requests easily
 - **Command Autocompletion**: Tab completion for all commands and options
 
+## Roadmap
+
+For details on upcoming features and development plans, see [docs/roadmap.md](docs/roadmap.md).
+
 ## Architecture
 
 This CLI tool uses a standalone architecture that connects directly to Ollama models. It's designed to be:
