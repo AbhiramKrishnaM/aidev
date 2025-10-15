@@ -1,10 +1,922 @@
 ---
 import Layout from "../layouts/Layout.astro";
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
 <Layout>
-  <h1 class="text-3xl">Hello world!</h1>
+  <!-- Navigation -->
+  <!-- <nav
+    class="fixed top-0 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800 z-50"
+  >
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-2">
+          <div
+            class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center"
+          >
+            <span class="text-white font-bold text-lg">AI</span>
+          </div>
+          <span
+            class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+            >AIDEV</span
+          >
+        </div>
+        <div class="hidden md:flex items-center space-x-8">
+          <a
+            href="#features"
+            class="text-slate-300 hover:text-white transition-colors"
+            >Features</a
+          >
+          <a
+            href="#installation"
+            class="text-slate-300 hover:text-white transition-colors"
+            >Installation</a
+          >
+          <a
+            href="#usage"
+            class="text-slate-300 hover:text-white transition-colors">Usage</a
+          >
+          <a
+            href="#docs"
+            class="text-slate-300 hover:text-white transition-colors">Docs</a
+          >
+          <a
+            href="https://github.com/AbhiramKrishnaM/aidev"
+            target="_blank"
+            class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
+          >
+            GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav> -->
+
+  <!-- Hero Section -->
+  <section class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <!-- Background gradient effects -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div
+        class="absolute top-0 right-0 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"
+      >
+      </div>
+      <div
+        class="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"
+      >
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative">
+      <div class="text-center max-w-4xl mx-auto">
+        <div
+          class="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full mb-6"
+        >
+          <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+          <span class="text-sm text-indigo-300">100% Local & Private</span>
+        </div>
+
+        <h1
+          class="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-indigo-200 to-purple-200 bg-clip-text text-transparent"
+        >
+          AI-Powered CLI Assistant for Developers
+        </h1>
+
+        <p class="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed">
+          Generate code, suggest terminal commands, search docs, assist with
+          Git, and test APIs —
+          <span class="text-indigo-400 font-semibold">all running locally</span>
+          using Ollama's LLM models.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <a
+            href="#installation"
+            class="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-semibold text-lg transition-all hover:scale-105 shadow-lg shadow-indigo-500/50"
+          >
+            Get Started
+          </a>
+          <a
+            href="#features"
+            class="px-8 py-4 bg-slate-800 hover:bg-slate-700 rounded-lg font-semibold text-lg transition-all hover:scale-105 border border-slate-700"
+          >
+            View Features
+          </a>
+        </div>
+
+        <!-- Code Example -->
+        <div class="max-w-2xl mx-auto">
+          <div
+            class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-2xl"
+          >
+            <div class="bg-slate-800 px-4 py-2 flex items-center space-x-2">
+              <div class="flex space-x-2">
+                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+              </div>
+              <span class="text-sm text-slate-400 ml-4">Terminal</span>
+            </div>
+            <div class="p-6 font-mono text-sm text-left">
+              <div class="flex items-start space-x-2 mb-2">
+                <span class="text-indigo-400">$</span>
+                <span class="text-slate-300">pip install aidev</span>
+              </div>
+              <div class="flex items-start space-x-2 mb-4">
+                <span class="text-indigo-400">$</span>
+                <span class="text-slate-300"
+                  >aidev code generate "Create a REST API"</span
+                >
+              </div>
+              <div class="text-green-400 animate-pulse">
+                ✓ Generating code with deepseek-r1:7b...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="py-20 px-4 sm:px-6 lg:px-8 bg-slate-900/50">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <h2
+          class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent"
+        >
+          Powerful Features
+        </h2>
+        <p class="text-xl text-slate-400">
+          Everything you need for AI-assisted development
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div
+          class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:border-indigo-500 transition-all hover:shadow-lg hover:shadow-indigo-500/20"
+        >
+          <div
+            class="w-12 h-12 bg-indigo-500/10 rounded-lg flex items-center justify-center mb-4"
+          >
+            <svg
+              class="w-6 h-6 text-indigo-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-white">Code Generation</h3>
+          <p class="text-slate-400">
+            Generate code snippets from natural language descriptions in any
+            programming language.
+          </p>
+          <div
+            class="mt-4 font-mono text-xs text-indigo-300 bg-slate-900 p-2 rounded"
+          >
+            aidev code generate "function"
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div
+          class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:border-purple-500 transition-all hover:shadow-lg hover:shadow-purple-500/20"
+        >
+          <div
+            class="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center mb-4"
+          >
+            <svg
+              class="w-6 h-6 text-purple-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-white">Terminal Commands</h3>
+          <p class="text-slate-400">
+            Get suggestions and explanations for complex terminal operations
+            instantly.
+          </p>
+          <div
+            class="mt-4 font-mono text-xs text-purple-300 bg-slate-900 p-2 rounded"
+          >
+            aidev terminal suggest "find files"
+          </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div
+          class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:border-cyan-500 transition-all hover:shadow-lg hover:shadow-cyan-500/20"
+        >
+          <div
+            class="w-12 h-12 bg-cyan-500/10 rounded-lg flex items-center justify-center mb-4"
+          >
+            <svg
+              class="w-6 h-6 text-cyan-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-white">
+            Documentation Search
+          </h3>
+          <p class="text-slate-400">
+            Search and summarize documentation locally with AI-powered insights.
+          </p>
+          <div
+            class="mt-4 font-mono text-xs text-cyan-300 bg-slate-900 p-2 rounded"
+          >
+            aidev docs search "async"
+          </div>
+        </div>
+
+        <!-- Feature 4 -->
+        <div
+          class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:border-green-500 transition-all hover:shadow-lg hover:shadow-green-500/20"
+        >
+          <div
+            class="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center mb-4"
+          >
+            <svg
+              class="w-6 h-6 text-green-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-white">Git Assistance</h3>
+          <p class="text-slate-400">
+            Generate commit messages and PR descriptions based on your changes
+            automatically.
+          </p>
+          <div
+            class="mt-4 font-mono text-xs text-green-300 bg-slate-900 p-2 rounded"
+          >
+            aidev git generate-commit
+          </div>
+        </div>
+
+        <!-- Feature 5 -->
+        <div
+          class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20"
+        >
+          <div
+            class="w-12 h-12 bg-orange-500/10 rounded-lg flex items-center justify-center mb-4"
+          >
+            <svg
+              class="w-6 h-6 text-orange-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-white">API Testing</h3>
+          <p class="text-slate-400">
+            Test and format API requests easily with built-in Ollama
+            integration.
+          </p>
+          <div
+            class="mt-4 font-mono text-xs text-orange-300 bg-slate-900 p-2 rounded"
+          >
+            aidev api request "query"
+          </div>
+        </div>
+
+        <!-- Feature 6 -->
+        <div
+          class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:border-pink-500 transition-all hover:shadow-lg hover:shadow-pink-500/20"
+        >
+          <div
+            class="w-12 h-12 bg-pink-500/10 rounded-lg flex items-center justify-center mb-4"
+          >
+            <svg
+              class="w-6 h-6 text-pink-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-white">100% Private</h3>
+          <p class="text-slate-400">
+            All processing happens locally on your machine. No data leaves your
+            computer.
+          </p>
+          <div
+            class="mt-4 font-mono text-xs text-pink-300 bg-slate-900 p-2 rounded"
+          >
+            Powered by Ollama
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation Section -->
+  <section id="installation" class="py-20 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-16">
+        <h2
+          class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent"
+        >
+          Quick Installation
+        </h2>
+        <p class="text-xl text-slate-400">Get started in minutes</p>
+      </div>
+
+      <div class="space-y-8">
+        <!-- Step 1 -->
+        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-8">
+          <div class="flex items-start space-x-4">
+            <div
+              class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold"
+            >
+              1
+            </div>
+            <div class="flex-1">
+              <h3 class="text-2xl font-bold mb-3 text-white">
+                Install Prerequisites
+              </h3>
+              <p class="text-slate-400 mb-4">
+                First, make sure you have Python 3.8+ and Ollama installed:
+              </p>
+              <div class="bg-slate-900 rounded-lg p-4 border border-slate-700">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-sm text-slate-400 font-mono"
+                    >Install Ollama</span
+                  >
+                </div>
+                <code class="text-sm text-indigo-300 font-mono">
+                  # Download from https://ollama.ai
+                </code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-8">
+          <div class="flex items-start space-x-4">
+            <div
+              class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold"
+            >
+              2
+            </div>
+            <div class="flex-1">
+              <h3 class="text-2xl font-bold mb-3 text-white">Install AIDEV</h3>
+              <p class="text-slate-400 mb-4">
+                Install using pip (recommended):
+              </p>
+              <div class="bg-slate-900 rounded-lg p-4 border border-slate-700">
+                <code class="text-sm text-indigo-300 font-mono">
+                  pip install aidev
+                </code>
+              </div>
+              <p class="text-slate-400 mt-4 mb-2">Or install from source:</p>
+              <div class="bg-slate-900 rounded-lg p-4 border border-slate-700">
+                <code class="text-sm text-indigo-300 font-mono block mb-2">
+                  git clone https://github.com/AbhiramKrishnaM/aidev.git
+                </code>
+                <code class="text-sm text-indigo-300 font-mono block mb-2">
+                  cd aidev
+                </code>
+                <code class="text-sm text-indigo-300 font-mono block">
+                  pip install -e .
+                </code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-8">
+          <div class="flex items-start space-x-4">
+            <div
+              class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold"
+            >
+              3
+            </div>
+            <div class="flex-1">
+              <h3 class="text-2xl font-bold mb-3 text-white">
+                Download AI Model
+              </h3>
+              <p class="text-slate-400 mb-4">
+                Pull the recommended DeepSeek model:
+              </p>
+              <div class="bg-slate-900 rounded-lg p-4 border border-slate-700">
+                <code class="text-sm text-indigo-300 font-mono">
+                  ollama pull deepseek-r1:7b
+                </code>
+              </div>
+              <p class="text-slate-400 mt-4 text-sm">
+                Other supported models: llama2:7b, mistral:7b, codellama, etc.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-8">
+          <div class="flex items-start space-x-4">
+            <div
+              class="flex-shrink-0 w-10 h-10 bg-green-600 rounded-full flex items-center justify-center font-bold"
+            >
+              ✓
+            </div>
+            <div class="flex-1">
+              <h3 class="text-2xl font-bold mb-3 text-white">You're Ready!</h3>
+              <p class="text-slate-400 mb-4">Test your installation:</p>
+              <div class="bg-slate-900 rounded-lg p-4 border border-slate-700">
+                <code class="text-sm text-indigo-300 font-mono block mb-2">
+                  aidev --help
+                </code>
+                <code class="text-sm text-green-400 font-mono block">
+                  aidev code generate "hello world function"
+                </code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Usage Examples Section -->
+  <section id="usage" class="py-20 px-4 sm:px-6 lg:px-8 bg-slate-900/50">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <h2
+          class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent"
+        >
+          Usage Examples
+        </h2>
+        <p class="text-xl text-slate-400">See AIDEV in action</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Example 1 -->
+        <div
+          class="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden"
+        >
+          <div class="bg-slate-700/50 px-6 py-4 border-b border-slate-600">
+            <h3 class="font-bold text-white">Code Generation</h3>
+            <p class="text-sm text-slate-400 mt-1">
+              Generate functions, classes, and more
+            </p>
+          </div>
+          <div class="p-6">
+            <div
+              class="bg-slate-900 rounded-lg p-4 border border-slate-700 font-mono text-sm"
+            >
+              <div class="text-slate-500"># Generate a Python function</div>
+              <div class="text-indigo-300 mt-2">$ aidev code generate \</div>
+              <div class="text-indigo-300 ml-4">
+                "Create a function to calculate factorial"
+              </div>
+              <div class="mt-4 text-slate-400">
+                <div class="text-green-400">✓ Generated:</div>
+                <div class="mt-2 text-purple-300">
+                  def factorial(n: int) -&gt; int:
+                </div>
+                <div class="ml-4 text-purple-300">if n &lt;= 1:</div>
+                <div class="ml-8 text-purple-300">return 1</div>
+                <div class="ml-4 text-purple-300">
+                  return n * factorial(n - 1)
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Example 2 -->
+        <div
+          class="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden"
+        >
+          <div class="bg-slate-700/50 px-6 py-4 border-b border-slate-600">
+            <h3 class="font-bold text-white">Terminal Assistance</h3>
+            <p class="text-sm text-slate-400 mt-1">
+              Get command suggestions instantly
+            </p>
+          </div>
+          <div class="p-6">
+            <div
+              class="bg-slate-900 rounded-lg p-4 border border-slate-700 font-mono text-sm"
+            >
+              <div class="text-slate-500"># Find large files</div>
+              <div class="text-indigo-300 mt-2">$ aidev terminal suggest \</div>
+              <div class="text-indigo-300 ml-4">
+                "find all files larger than 100MB"
+              </div>
+              <div class="mt-4 text-slate-400">
+                <div class="text-green-400">✓ Suggestion:</div>
+                <div class="mt-2 text-cyan-300">find . -type f -size +100M</div>
+                <div class="mt-2 text-slate-500"># Or with details:</div>
+                <div class="text-cyan-300">
+                  find . -type f -size +100M -exec ls -lh {} \;
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Example 3 -->
+        <div
+          class="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden"
+        >
+          <div class="bg-slate-700/50 px-6 py-4 border-b border-slate-600">
+            <h3 class="font-bold text-white">Git Assistance</h3>
+            <p class="text-sm text-slate-400 mt-1">
+              Auto-generate commit messages
+            </p>
+          </div>
+          <div class="p-6">
+            <div
+              class="bg-slate-900 rounded-lg p-4 border border-slate-700 font-mono text-sm"
+            >
+              <div class="text-slate-500"># Generate commit message</div>
+              <div class="text-indigo-300 mt-2">
+                $ aidev git generate-commit
+              </div>
+              <div class="mt-4 text-slate-400">
+                <div class="text-green-400">✓ Analyzing changes...</div>
+                <div class="mt-2 text-yellow-300">Suggested commit:</div>
+                <div class="mt-2 text-white">
+                  "feat: Add user authentication
+                </div>
+                <div class="text-white">with JWT tokens"</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Example 4 -->
+        <div
+          class="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden"
+        >
+          <div class="bg-slate-700/50 px-6 py-4 border-b border-slate-600">
+            <h3 class="font-bold text-white">Documentation Search</h3>
+            <p class="text-sm text-slate-400 mt-1">Search and summarize docs</p>
+          </div>
+          <div class="p-6">
+            <div
+              class="bg-slate-900 rounded-lg p-4 border border-slate-700 font-mono text-sm"
+            >
+              <div class="text-slate-500"># Search documentation</div>
+              <div class="text-indigo-300 mt-2">
+                $ aidev docs search "async" \
+              </div>
+              <div class="text-indigo-300 ml-4">--language python</div>
+              <div class="mt-4 text-slate-400">
+                <div class="text-green-400">✓ Found 12 results</div>
+                <div class="mt-2 text-slate-300">📄 async_programming.md</div>
+                <div class="text-slate-400 ml-4">
+                  Async/await syntax in Python...
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advanced Options -->
+      <div
+        class="mt-12 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-xl p-8"
+      >
+        <h3 class="text-2xl font-bold mb-4 text-white">Advanced Options</h3>
+        <div class="grid md:grid-cols-2 gap-6 font-mono text-sm">
+          <div>
+            <div class="text-indigo-400 mb-2">Choose different models:</div>
+            <div class="bg-slate-900 rounded p-3 text-slate-300">
+              aidev --model llama2:7b code generate "..."
+            </div>
+          </div>
+          <div>
+            <div class="text-purple-400 mb-2">Disable streaming:</div>
+            <div class="bg-slate-900 rounded p-3 text-slate-300">
+              aidev --no-stream terminal suggest "..."
+            </div>
+          </div>
+          <div>
+            <div class="text-cyan-400 mb-2">Hide thinking process:</div>
+            <div class="bg-slate-900 rounded p-3 text-slate-300">
+              aidev --no-thinking git generate-commit
+            </div>
+          </div>
+          <div>
+            <div class="text-green-400 mb-2">Save output to file:</div>
+            <div class="bg-slate-900 rounded p-3 text-slate-300">
+              aidev code generate "..." --output file.py
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Documentation Links Section -->
+  <section id="docs" class="py-20 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-16">
+        <h2
+          class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent"
+        >
+          Documentation & Resources
+        </h2>
+        <p class="text-xl text-slate-400">
+          Everything you need to master AIDEV
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <a
+          href="#"
+          class="group bg-slate-800/50 border border-slate-700 hover:border-indigo-500 rounded-xl p-6 transition-all hover:shadow-lg hover:shadow-indigo-500/20"
+        >
+          <div
+            class="w-12 h-12 bg-indigo-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-indigo-500/20 transition-colors"
+          >
+            <svg
+              class="w-6 h-6 text-indigo-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              ></path>
+            </svg>
+          </div>
+          <h3
+            class="text-xl font-bold mb-2 text-white group-hover:text-indigo-400 transition-colors"
+          >
+            Development Guide
+          </h3>
+          <p class="text-slate-400">Learn how to contribute and extend AIDEV</p>
+        </a>
+
+        <a
+          href="#"
+          class="group bg-slate-800/50 border border-slate-700 hover:border-purple-500 rounded-xl p-6 transition-all hover:shadow-lg hover:shadow-purple-500/20"
+        >
+          <div
+            class="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-500/20 transition-colors"
+          >
+            <svg
+              class="w-6 h-6 text-purple-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+              ></path>
+            </svg>
+          </div>
+          <h3
+            class="text-xl font-bold mb-2 text-white group-hover:text-purple-400 transition-colors"
+          >
+            Ollama Integration
+          </h3>
+          <p class="text-slate-400">Detailed guide on using Ollama models</p>
+        </a>
+
+        <a
+          href="#"
+          class="group bg-slate-800/50 border border-slate-700 hover:border-cyan-500 rounded-xl p-6 transition-all hover:shadow-lg hover:shadow-cyan-500/20"
+        >
+          <div
+            class="w-12 h-12 bg-cyan-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-cyan-500/20 transition-colors"
+          >
+            <svg
+              class="w-6 h-6 text-cyan-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+          </div>
+          <h3
+            class="text-xl font-bold mb-2 text-white group-hover:text-cyan-400 transition-colors"
+          >
+            Roadmap
+          </h3>
+          <p class="text-slate-400">See what's coming next for AIDEV</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div
+      class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10"
+    >
+    </div>
+    <div class="max-w-4xl mx-auto text-center relative">
+      <h2
+        class="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent"
+      >
+        Ready to boost your productivity?
+      </h2>
+      <p class="text-xl text-slate-300 mb-8">
+        Join developers using AI-powered assistance for their daily workflows
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a
+          href="#installation"
+          class="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-semibold text-lg transition-all hover:scale-105 shadow-lg shadow-indigo-500/50"
+        >
+          Install Now
+        </a>
+        <a
+          href="https://github.com/AbhiramKrishnaM/aidev"
+          target="_blank"
+          class="px-8 py-4 bg-slate-800 hover:bg-slate-700 rounded-lg font-semibold text-lg transition-all hover:scale-105 border border-slate-700"
+        >
+          View on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer
+    class="bg-slate-900 border-t border-slate-800 py-12 px-4 sm:px-6 lg:px-8"
+  >
+    <div class="max-w-7xl mx-auto">
+      <div class="grid md:grid-cols-4 gap-8 mb-8">
+        <div>
+          <div class="flex items-center space-x-2 mb-4">
+            <div
+              class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center"
+            >
+              <span class="text-white font-bold">AI</span>
+            </div>
+            <span
+              class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+              >AIDEV</span
+            >
+          </div>
+          <p class="text-slate-400 text-sm">
+            AI-powered CLI assistant for developers. Fast, flexible, and
+            completely private.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-white mb-4">Product</h4>
+          <ul class="space-y-2 text-slate-400 text-sm">
+            <li>
+              <a
+                href="#features"
+                class="hover:text-indigo-400 transition-colors">Features</a
+              >
+            </li>
+            <li>
+              <a
+                href="#installation"
+                class="hover:text-indigo-400 transition-colors">Installation</a
+              >
+            </li>
+            <li>
+              <a href="#usage" class="hover:text-indigo-400 transition-colors"
+                >Usage</a
+              >
+            </li>
+            <li>
+              <a href="#docs" class="hover:text-indigo-400 transition-colors"
+                >Documentation</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-white mb-4">Resources</h4>
+          <ul class="space-y-2 text-slate-400 text-sm">
+            <li>
+              <a href="#" class="hover:text-indigo-400 transition-colors"
+                >Development Guide</a
+              >
+            </li>
+            <li>
+              <a href="#" class="hover:text-indigo-400 transition-colors"
+                >Ollama Setup</a
+              >
+            </li>
+            <li>
+              <a href="#" class="hover:text-indigo-400 transition-colors"
+                >Contributing</a
+              >
+            </li>
+            <li>
+              <a href="#" class="hover:text-indigo-400 transition-colors"
+                >Roadmap</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-white mb-4">Community</h4>
+          <ul class="space-y-2 text-slate-400 text-sm">
+            <li>
+              <a
+                href="https://github.com/AbhiramKrishnaM/aidev"
+                target="_blank"
+                class="hover:text-indigo-400 transition-colors">GitHub</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://github.com/AbhiramKrishnaM/aidev/issues"
+                target="_blank"
+                class="hover:text-indigo-400 transition-colors">Issues</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://github.com/AbhiramKrishnaM/aidev/discussions"
+                target="_blank"
+                class="hover:text-indigo-400 transition-colors">Discussions</a
+              >
+            </li>
+            <li>
+              <a href="#" class="hover:text-indigo-400 transition-colors"
+                >Discord</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-800 pt-8">
+        <div
+          class="flex flex-col md:flex-row justify-between items-center text-sm text-slate-400"
+        >
+          <p>© 2025 AIDEV. Open source under MIT License.</p>
+          <div class="flex space-x-6 mt-4 md:mt-0">
+            <a href="#" class="hover:text-indigo-400 transition-colors"
+              >Privacy</a
+            >
+            <a href="#" class="hover:text-indigo-400 transition-colors">Terms</a
+            >
+            <a href="#" class="hover:text-indigo-400 transition-colors"
+              >License</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
 </Layout>
