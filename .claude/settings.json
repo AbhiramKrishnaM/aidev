@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0; cd \"$ROOT\" || exit 0; mkdir -p .claude/hooks-state; STATE_FILE=.claude/hooks-state/changelog.status; SIG=$( (git diff -- . \":!CHANGELOG.md\" 2>/dev/null; git diff --cached -- . \":!CHANGELOG.md\" 2>/dev/null; git status --short 2>/dev/null | grep -v CHANGELOG.md) ); if [ -z \"$SIG\" ]; then exit 0; fi; HASH=$(printf \"%s\" \"$SIG\" | cksum); PREV=\"\"; if [ -f \"$STATE_FILE\" ]; then PREV=$(cat \"$STATE_FILE\"); fi; if [ \"$HASH\" = \"$PREV\" ]; then exit 0; fi; printf \"%s\" \"$HASH\" > \"$STATE_FILE\"; jq -n --arg reason \"There are uncommitted changes not yet reflected in CHANGELOG.md. Before stopping, follow .claude/skills/changelog/SKILL.md: get the current date and time via the date command, write 1-5 short bullets summarizing what changed, and prepend a new dated entry to CHANGELOG.md (create it with a top-level Changelog heading if missing). Do not commit. Then finish normally.\" '{decision:\"block\", reason:$reason}'",
+            "timeout": 15,
+            "statusMessage": "Checking whether CHANGELOG.md needs an entry..."
+          }
+        ]
+      }
+    ]
+  }
+}

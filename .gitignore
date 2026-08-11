@@ -2,6 +2,9 @@
 Tasks.md
 project.txt
 
+# Claude Code local hook state (not shared across machines)
+.claude/hooks-state/
+
 # Python
 __pycache__/
 *.py[cod]
