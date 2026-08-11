@@ -10,14 +10,6 @@ CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
 
 # Default configuration
 DEFAULT_CONFIG = {
-    "backend": {
-        "url": "http: //localhost: 8000",
-        "timeout": 30,
-    },
-    "models": {
-        "code_generation": "huggingface/CodeLlama-7b-Instruct-hf",
-        "text_generation": "huggingface/mistralai/Mistral-7B-Instruct-v0.2",
-    },
     "appearance": {
         "theme": "default",
         "color_output": True,
@@ -25,12 +17,6 @@ DEFAULT_CONFIG = {
     "history": {
         "save_history": True,
         "max_history_items": 100,
-    },
-    "ollama": {
-        "enabled": True,
-        "url": "http: //localhost: 11434/api",
-        "default_model": "deepseek-r1: 7b",
-        "timeout": 60,
     },
 }
 

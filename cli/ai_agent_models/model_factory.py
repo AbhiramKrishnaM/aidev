@@ -7,10 +7,10 @@ from . import MODEL_CLASSES, get_model_class
 from .base_model import BaseAIModel
 
 
-def get_default_model_name() -> str:
-    """Get the default model name from configuration."""
-    result = get_config_value("ai.default_model", "deepseek-r1:7b")
-    return cast(str, result)  # Cast to str to satisfy mypy
+def get_default_model_name() -> Optional[str]:
+    """Get the default model name from configuration, if one has been set."""
+    result = get_config_value("ai.default_model", None)
+    return cast(Optional[str], result)
 
 
 _model_instances: Dict[str, BaseAIModel] = {}
@@ -21,7 +21,7 @@ def get_model(model_name: Optional[str] = None) -> Optional[BaseAIModel]:
     Get a model instance based on name.
 
     Args:
-        model_name: Name of the model to use (or None for default)
+        model_name: Name of the model to use (or None for the configured default)
 
     Returns:
         A model instance or None if not available
@@ -29,6 +29,10 @@ def get_model(model_name: Optional[str] = None) -> Optional[BaseAIModel]:
     # Use default model if none specified
     if model_name is None:
         model_name = get_default_model_name()
+
+    # No model configured and nothing to fall back to
+    if model_name is None:
+        return None
 
     # Return cached instance if available
     if model_name in _model_instances:

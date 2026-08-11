@@ -10,30 +10,25 @@ def api_request(
     endpoint: str,
     method: str = "GET",
     data: Optional[Dict[str, Any]] = None,
-    params: Optional[Dict[str, Any]] = None,
-    loading_message: Optional[str] = None,
-    use_local_model: bool = True,  # Default to using local models
-    local_model_name: Optional[str] = None,
+    model_name: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
-    Make a request to the local AI model.
+    Make a request to the configured AI model.
 
     Args:
         endpoint: API endpoint path (used to determine the type of request)
         method: HTTP method (for compatibility)
         data: Request data
-        params: Query parameters (unused)
-        loading_message: Custom loading message
-        use_local_model: Whether to use a local model (should always be True)
-        local_model_name: Name of the local model to use (e.g., "deepseek-r1:7b")
+        model_name: Name of the model to use (e.g., "anthropic:claude-sonnet-5"),
+            or None to use the configured default
     """
     # Get model
-    model = get_model(local_model_name)
+    model = get_model(model_name)
 
     if not model:
         return {
             "error": True,
-            "message": f"No local model available. Model '{local_model_name}' not found.",
+            "message": f"No AI provider configured. Model '{model_name}' not found.",
         }
 
     if endpoint == "/text/generate" and method == "POST":
@@ -44,7 +39,7 @@ def api_request(
         system_prompt = data.get("system_prompt") if data else None
         stream = data.get("stream", True) if data else True
 
-        # Generate text using local model
+        # Generate text using the configured model
         return model.generate_text(
             prompt=prompt,
             temperature=temperature,
@@ -60,7 +55,7 @@ def api_request(
         temperature = data.get("temperature", 0.7) if data else 0.7
         max_length = data.get("max_length") if data else None
 
-        # Generate code using local model
+        # Generate code using the configured model
         return model.generate_code(
             description=description,
             language=language,
@@ -95,12 +90,13 @@ def api_request(
         return {"error": True, "message": f"Unsupported endpoint: {endpoint}"}
 
 
-def get_available_local_models() -> List[str]:
+def list_available_models() -> List[str]:
     """
-    Get a list of available local models.
+    Get a list of available models across all detected providers.
 
     Returns:
-        List of model names or empty list if no models are available
+        List of model names (e.g. "anthropic:claude-sonnet-5") or empty list
+        if no provider is configured
     """
     models = get_available_models()
     return [name for name, info in models.items() if info.get("available", False)]

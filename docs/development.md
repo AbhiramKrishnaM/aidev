@@ -56,9 +56,8 @@ aidev/
 │   │   └── formatting.py  # Output formatting
 │   ├── ai_agent_models/   # AI model implementations
 │   │   ├── base_model.py            # Base abstract class for models
-│   │   ├── ollama_deepseek_r1_7b.py # Ollama model implementation
-│   │   ├── model_factory.py         # Model instantiation factory
-│   │   └── __init__.py              # Model registration
+│   │   ├── model_factory.py         # Provider/model registry and resolution
+│   │   └── __init__.py              # Provider registration (MODEL_CLASSES)
 │   └── main.py            # Entry point
 ├── tests/                 # Test suite
 ├── docs/                  # Documentation
@@ -143,22 +142,27 @@ We follow these coding standards:
    - Provide clear error messages to users
    - Use the formatting utilities for consistent output
 
-## Adding New Model Implementations
+## Adding a New AI Provider
 
-To add a new LLM model:
+See [`cli/ai_agent_models/README.md`](../cli/ai_agent_models/README.md) and
+[`docs/adr/0002-provider-and-model-abstraction.md`](adr/0002-provider-and-model-abstraction.md)
+for the current provider/model abstraction. In short:
 
-1. Create a new model class in `cli/ai_agent_models/`:
+1. Create a new provider class in `cli/ai_agent_models/`, e.g. `anthropic_model.py`:
    ```python
    from .base_model import BaseAIModel
 
-   class NewModel(BaseAIModel):
-       @property
-       def model_name(self) -> str:
-           return "new-model-name"
+   class AnthropicModel(BaseAIModel):
+       provider_id = "anthropic"
 
        @classmethod
        def is_available(cls) -> bool:
-           # Check if the model is available
+           # Check whether the provider's API key env var is set
+           ...
+
+       @classmethod
+       def list_models(cls) -> list:
+           # Return the provider's available model IDs
            ...
 
        def generate_text(self, prompt: str, **kwargs) -> dict:
@@ -168,20 +172,19 @@ To add a new LLM model:
        # Implement other required methods
    ```
 
-2. Register the model in `cli/ai_agent_models/__init__.py`:
+2. Register the provider in `cli/ai_agent_models/__init__.py`, keyed by `provider_id`:
    ```python
-   from .new_model import NewModel
+   from .anthropic_model import AnthropicModel
 
    MODEL_CLASSES = {
-       "existing-model": ExistingModel,
-       "new-model-name": NewModel,
+       "anthropic": AnthropicModel,
    }
    ```
 
 3. Test your implementation:
    ```bash
    # Run type checking
-   mypy cli/ai_agent_models/new_model.py
+   mypy cli/ai_agent_models/anthropic_model.py
 
    # Run unit tests
    pytest -xvs tests/test_models.py

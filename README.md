@@ -1,6 +1,14 @@
 # AI-Powered CLI Assistant
 
-An AI-powered command-line assistant for developers that provides code generation, terminal command suggestions, documentation search, git assistance, and API testing capabilities - all running locally using Ollama's LLM models.
+An AI-powered command-line assistant for developers that provides code generation, terminal command suggestions, documentation search, git assistance, and API testing capabilities.
+
+> **Mid-pivot:** this project is moving from a local-only Ollama backend to cloud AI providers
+> (Anthropic, OpenAI), with a new incident/debugging co-pilot as the flagship feature. The
+> architecture and rationale are fully written up in [`docs/adr/`](docs/adr/README.md) and
+> [`docs/architecture.md`](docs/architecture.md); the file-by-file build plan is in
+> [`docs/implementation-plan.md`](docs/implementation-plan.md). **The provider implementation
+> itself has not landed yet** — commands that call an AI model will report "no AI provider
+> configured" until it does.
 
 ## Features
 
@@ -13,18 +21,17 @@ An AI-powered command-line assistant for developers that provides code generatio
 
 ## Roadmap
 
-For details on upcoming features and development plans, see [docs/roadmap.md](docs/roadmap.md).
+For details on upcoming features and development plans, see [docs/roadmap.md](docs/roadmap.md)
+and the pivot documentation linked above.
 
 ## Architecture
 
-This CLI tool uses a standalone architecture that connects directly to Ollama models. It's designed to be:
-
-1. **Fast**: Connects directly to Ollama with no intermediate server
-2. **Flexible**: Supports different Ollama models through a modular framework
-3. **User-friendly**: Simple command-line interface with streaming output
-4. **Extensible**: Easy to add new model implementations
-
-The tool uses a pluggable model architecture that makes it easy to add support for additional Ollama models in the future.
+The CLI is built around a pluggable provider/model abstraction
+(`cli/ai_agent_models/base_model.py`, `model_factory.py`): each AI provider is a class
+implementing a common interface, registered by provider id, and addressed as
+`"<provider>:<model_id>"` (e.g. `anthropic:claude-sonnet-5`). See
+[`docs/architecture.md`](docs/architecture.md) for diagrams of how commands, the provider layer,
+and git-context gathering fit together.
 
 ## Installation
 
@@ -32,7 +39,6 @@ The tool uses a pluggable model architecture that makes it easy to add support f
 
 - Python 3.8+
 - Git
-- Ollama (required) - Install from [ollama.ai](https://ollama.ai)
 
 ### Setup
 
@@ -42,13 +48,6 @@ The easiest way to install the AI CLI Assistant is via pip:
 
 ```bash
 pip install aidev
-```
-
-After installation, make sure to set up Ollama:
-
-```bash
-# Install the recommended DeepSeek model
-ollama pull deepseek-r1:7b
 ```
 
 #### Installation from Source
@@ -73,16 +72,6 @@ ollama pull deepseek-r1:7b
 4. Install the CLI tool in development mode:
    ```bash
    pip install -e .
-   ```
-
-5. Install at least one model with Ollama:
-   ```bash
-   # Install the recommended DeepSeek model
-   ollama pull deepseek-r1:7b
-
-   # Or try other models
-   ollama pull llama2:7b
-   ollama pull mistral:7b
    ```
 
 #### Using Clean Install Scripts
@@ -200,26 +189,21 @@ aidev docs summarize README.md
 ### API Testing
 
 ```bash
-# Generate text with an Ollama model
+# Send an ad-hoc prompt to the configured model
 aidev api request "Explain how DNS works"
 
-# Generate text with a specific model
-aidev api request "Summarize quantum computing" --model llama2:7b
-
-# Configure Ollama API settings
-aidev api config --set-ollama-url "http://localhost:11434/api"
-
-# List available Ollama models
-aidev api models
+# Send it to a specific model
+aidev api request "Summarize quantum computing" --model anthropic:claude-sonnet-5
 ```
 
-## Working with Ollama Models
+## Choosing a model
 
-All commands support Ollama models with various options:
+Every AI command accepts `--model` (e.g. `--model anthropic:claude-sonnet-5`), or falls back to
+the configured default:
 
 ```bash
-# Select a specific Ollama model
-aidev terminal suggest --model "llama2:7b" "find large files"
+# Use a specific model for one command
+aidev terminal suggest --model anthropic:claude-sonnet-5 "find large files"
 
 # Disable streaming output
 aidev code generate --no-stream "Create a binary search function"
@@ -228,24 +212,9 @@ aidev code generate --no-stream "Create a binary search function"
 aidev terminal explain --no-thinking "grep -r pattern ."
 ```
 
-For complete Ollama setup and more details, see [docs/ollama.md](docs/ollama.md).
-
-## Advanced Usage
-
-### Model Configuration
-
-You can configure Ollama settings:
-
-```bash
-# Configure the default model
-aidev api config --set-ollama-model "deepseek-r1:7b"
-
-# Set the Ollama API timeout
-aidev api config --set-ollama-timeout 120
-
-# Show all current configuration
-aidev api config --all
-```
+Provider/model management (listing detected providers, picking a default) is planned per
+[`docs/implementation-plan.md`](docs/implementation-plan.md) and not yet implemented — see the
+note at the top of this file.
 
 ### Streaming and Thinking Process
 
@@ -276,7 +245,7 @@ aidev/
 │   ├── utils/             # Utilities
 │   ├── ai_agent_models/   # AI model implementations
 │   │   ├── base_model.py  # Base abstract class for models
-│   │   └── ollama_*.py    # Model implementations
+│   │   └── model_factory.py # Provider/model registry and resolution
 │   └── main.py            # Entry point
 ├── tests/                 # Test suite
 ├── docs/                  # Documentation
@@ -332,5 +301,7 @@ Interested in contributing? Check out our [Development Guide](docs/development.m
 ## Documentation
 
 - [Development Guide](docs/development.md) - Guide for contributors
-- [Ollama Integration](docs/ollama.md) - Detailed guide on using Ollama models
+- [Architecture Decision Records](docs/adr/README.md) - Rationale behind the current pivot
+- [Architecture](docs/architecture.md) - System diagrams (components, request flow, config resolution)
+- [Implementation Plan](docs/implementation-plan.md) - File-by-file plan for the pivot in progress
 - [PyPI Distribution](docs/pypi_distribution.md) - Information on packaging and publishing

@@ -31,14 +31,19 @@ sequence diagram, and the credential/config resolution flow).
 ### Status as of this writing
 
 - ADRs and `docs/architecture.md` are written and reflect the agreed design.
-- **No implementation code has been written yet.** `cli/` still reflects the old Ollama-only
-  design (`cli/ai_agent_models/ollama_deepseek_r1_7b.py`, `--local/--api` flags scattered across
-  `cli/commands/*.py`, `cli/utils/api.py`'s fake `/text/generate` endpoint dispatcher, etc.) —
-  this is expected to change per the ADRs above, it is not a bug to "fix" back to its current
-  state.
-- A detailed code-level implementation plan (file-by-file changes, new files to create, in what
-  order) is written up at [`docs/implementation-plan.md`](docs/implementation-plan.md) — pick up
-  from there rather than re-deriving it from scratch.
+- **The Ollama-only implementation has been removed** (cleanup pass, done): the Ollama model
+  class, its `--local/--api` flags, the fake `/text/generate` endpoint dispatcher, Ollama-shaped
+  config defaults, duplicated `models()` subcommands, and all Ollama copy in the README/website
+  are gone. `cli/ai_agent_models/MODEL_CLASSES` is now an **empty registry** — every AI command
+  runs, resolves "no AI provider configured," and degrades to its mock/heuristic fallback where
+  one exists (`git.py`, `docs.py`, `terminal.py`) or errors cleanly where one doesn't (`code.py`).
+  This is expected, not a bug to "fix" by re-adding Ollama.
+- **No provider implementation exists yet** — `AnthropicModel`/`OpenAIModel`, the `aidev models`
+  command group, and `aidev incident analyze` are still all unbuilt.
+- A detailed code-level implementation plan for building those (file-by-file changes, new files
+  to create, in what order) is written up at
+  [`docs/implementation-plan.md`](docs/implementation-plan.md) — pick up from there rather than
+  re-deriving it from scratch.
 
 If asked to implement the next step of this pivot, start from the ADRs/architecture doc above for
 the "what and why," and confirm with the user before making structural changes that don't match

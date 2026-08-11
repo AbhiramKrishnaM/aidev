@@ -7,7 +7,7 @@ from rich import print
 from rich.panel import Panel
 from rich.syntax import Syntax
 
-from cli.utils.api import api_request, get_available_local_models
+from cli.utils.api import api_request, list_available_models
 from cli.utils.formatting import print_error, print_info, print_success, print_warning
 
 app = typer.Typer(help="Generate and manage code snippets")
@@ -26,8 +26,8 @@ def generate(
     max_length: Optional[int] = typer.Option(
         None, "--max-length", "-l", help="Maximum length of generated code"
     ),
-    model: str = typer.Option(
-        "deepseek-r1:7b", "--model", "-m", help="Specify which local model to use"
+    model: Optional[str] = typer.Option(
+        None, "--model", "-m", help="Model to use (defaults to the configured default)"
     ),
     no_stream: bool = typer.Option(
         False, "--no-stream", help="Disable streaming for local models"
@@ -42,22 +42,18 @@ def generate(
     print(f"Generating {language} code for: {description}")
 
     # Check for available models
-    local_models = get_available_local_models()
-    if not local_models:
-        print_error("No local models available. Please install an Ollama model first.")
-        print_info("Try running: ollama pull deepseek-r1:7b")
+    available_models = list_available_models()
+    if not available_models:
+        print_error("No AI provider configured.")
+        print_info("Export ANTHROPIC_API_KEY or OPENAI_API_KEY to get started.")
         return
 
-    if model not in local_models:
+    if model and model not in available_models:
         print_warning(
-            f"Model '{model}' not found. Available models: {', '.join(local_models)}"
+            f"Model '{model}' not found. Available models: {', '.join(available_models)}"
         )
-        if "deepseek-r1:7b" in local_models:
-            model = "deepseek-r1:7b"
-            print_info("Using deepseek-r1:7b instead.")
-        else:
-            model = local_models[0]
-            print_info(f"Using {model} instead.")
+        model = available_models[0]
+        print_info(f"Using {model} instead.")
 
     # Request code generation
     response = api_request(
@@ -71,9 +67,7 @@ def generate(
             "stream": not no_stream,
             "show_thinking": show_thinking,
         },
-        loading_message=f"Generating {language} code with {model}...",
-        use_local_model=True,
-        local_model_name=model,
+        model_name=model,
     )
 
     # Extract the code from response
@@ -144,8 +138,8 @@ def explain(
         "-d",
         help="Explanation detail level (brief, medium, detailed)",
     ),
-    model: str = typer.Option(
-        "deepseek-r1:7b", "--model", "-m", help="Specify which local model to use"
+    model: Optional[str] = typer.Option(
+        None, "--model", "-m", help="Model to use (defaults to the configured default)"
     ),
     no_stream: bool = typer.Option(
         False, "--no-stream", help="Disable streaming for local models"
@@ -169,24 +163,18 @@ def explain(
         print(f"Explaining code from {file_path}:")
 
         # Check for available models
-        local_models = get_available_local_models()
-        if not local_models:
-            print_error(
-                "No local models available. Please install an Ollama model first."
-            )
-            print_info("Try running: ollama pull deepseek-r1:7b")
+        available_models = list_available_models()
+        if not available_models:
+            print_error("No AI provider configured.")
+            print_info("Export ANTHROPIC_API_KEY or OPENAI_API_KEY to get started.")
             return
 
-        if model not in local_models:
+        if model and model not in available_models:
             print_warning(
-                f"Model '{model}' not found. Available models: {', '.join(local_models)}"
+                f"Model '{model}' not found. Available models: {', '.join(available_models)}"
             )
-            if "deepseek-r1:7b" in local_models:
-                model = "deepseek-r1:7b"
-                print_info("Using deepseek-r1:7b instead.")
-            else:
-                model = local_models[0]
-                print_info(f"Using {model} instead.")
+            model = available_models[0]
+            print_info(f"Using {model} instead.")
 
         # Infer language if not specified
         if not language:
@@ -237,9 +225,7 @@ def explain(
                 "stream": not no_stream,
                 "show_thinking": show_thinking,
             },
-            loading_message=f"Analyzing code with {model}...",
-            use_local_model=True,
-            local_model_name=model,
+            model_name=model,
         )
 
         if "error" in response:
@@ -261,21 +247,3 @@ def explain(
         print_error(f"File not found: {file_path}")
     except Exception as e:
         print_error(f"Error explaining code: {str(e)}")
-
-
-@app.command()
-def models() -> None:
-    """List available code models."""
-    models = get_available_local_models()
-
-    if not models:
-        print_error("No local models available.")
-        print_info("Try running: ollama pull deepseek-r1:7b")
-        return
-
-    print("[bold]Available local models:[/bold]")
-    for i, model in enumerate(models, 1):
-        print(f"{i}. {model}")
-
-    print("\n[bold green]To use a specific model:[/bold green]")
-    print('aidev code generate --model MODEL_NAME "your description here"')

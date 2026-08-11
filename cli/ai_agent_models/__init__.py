@@ -3,12 +3,11 @@
 from typing import Dict, Optional, Type
 
 from .base_model import BaseAIModel
-from .ollama_deepseek_r1_7b import OllamaDeepSeekModel
 
-# Register all available model classes
-MODEL_CLASSES: Dict[str, Type[BaseAIModel]] = {
-    "deepseek-r1:7b": OllamaDeepSeekModel,
-}
+# Provider model classes are registered here as they're implemented.
+# Currently empty following the Ollama removal — see docs/implementation-plan.md
+# for the Anthropic/OpenAI providers being added next.
+MODEL_CLASSES: Dict[str, Type[BaseAIModel]] = {}
 
 
 def get_model_class(model_name: str) -> Optional[Type[BaseAIModel]]:

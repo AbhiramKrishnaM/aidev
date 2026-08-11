@@ -1,25 +1,17 @@
 """Git operations assistance."""
 
 import os
-import subprocess
 from typing import Dict, List, Optional
 
 import typer
 from rich import print
 from rich.panel import Panel
 
-from cli.utils.api import api_request, get_available_local_models
+from cli.utils.api import api_request, list_available_models
 from cli.utils.formatting import print_error, print_info, print_success, print_warning
+from cli.utils.git import run_git_command
 
 app = typer.Typer(help="Git operations assistance")
-
-
-def _run_git_command(cmd: List[str]) -> str:
-    """Run a git command and return the output."""
-    try:
-        return subprocess.check_output(cmd, stderr=subprocess.STDOUT, text=True)
-    except subprocess.CalledProcessError as e:
-        return f"Error: {e.output}"
 
 
 @app.command()
@@ -30,11 +22,8 @@ def generate_commit(
     files: Optional[bool] = typer.Option(
         False, "--files", "-f", help="Show changed files in the message"
     ),
-    use_local: bool = typer.Option(
-        True, "--local/--api", help="Use local AI model instead of API backend"
-    ),
-    model: str = typer.Option(
-        "deepseek-r1: 7b", "--model", "-m", help="Specify which local model to use"
+    model: Optional[str] = typer.Option(
+        None, "--model", "-m", help="Model to use (defaults to the configured default)"
     ),
     no_stream: bool = typer.Option(
         False, "--no-stream", help="Disable streaming for local models"
@@ -47,7 +36,7 @@ def generate_commit(
 ) -> None:
     """Generate a commit message for the current changes."""
     # Get changed files
-    status_output = _run_git_command(["git", "status", "--porcelain"])
+    status_output = run_git_command(["git", "status", "--porcelain"])
 
     if not status_output or status_output.startswith("Error"):
         if "Error" in status_output:
@@ -64,36 +53,25 @@ def generate_commit(
             file_path = line[3:]
             changes.append((status, file_path))
 
-    # Check Ollama availability for local model usage
+    available_models = list_available_models()
+    use_ai = bool(available_models)
+    if use_ai and model and model not in available_models:
+        print_warning(
+            f"Model '{model}' not found. Available models: {', '.join(available_models)}"
+        )
+        model = available_models[0]
+        print_info(f"Using {model} instead.")
 
-    if use_local:
-        local_models = get_available_local_models()
-        if not local_models:
-            print_warning(
-                "No local models found in Ollama. Falling back to simple generation."
-            )
-            use_local = False
-        elif model not in local_models:
-            print_warning(
-                f"Model '{model}' not found. Available models: {', '.join(local_models)}"
-            )
-            if "deepseek-r1: 7b" in local_models:
-                model = "deepseek-r1: 7b"
-                print_info("Using deepseek-r1: 7b instead.")
-            else:
-                model = local_models[0]
-                print_info(f"Using {model} instead.")
-
-    if use_local:
+    if use_ai:
         # Get the diff for context
-        diff_output = _run_git_command(["git", "diff", "--cached", "--stat"])
+        diff_output = run_git_command(["git", "diff", "--cached", "--stat"])
         if not diff_output or diff_output.startswith("Error"):
-            diff_output = _run_git_command(["git", "diff", "--stat"])
+            diff_output = run_git_command(["git", "diff", "--stat"])
 
         # Get the full diff for better context
-        full_diff = _run_git_command(["git", "diff", "--cached"])
+        full_diff = run_git_command(["git", "diff", "--cached"])
         if not full_diff or full_diff.startswith("Error"):
-            full_diff = _run_git_command(["git", "diff"])
+            full_diff = run_git_command(["git", "diff"])
 
         # If the diff is too large, truncate it
         if len(full_diff) > 4000:
@@ -107,9 +85,7 @@ def generate_commit(
         # Get the repository name
         repo_name = "unknown"
         try:
-            remote_url = _run_git_command(
-                ["git", "remote", "get-url", "origin"]
-            ).strip()
+            remote_url = run_git_command(["git", "remote", "get-url", "origin"]).strip()
             if remote_url:
                 # Extract repository name from URL
                 if "github.com" in remote_url:
@@ -121,7 +97,7 @@ def generate_commit(
                     repo_name = os.path.basename(
                         os.path.normpath(remote_url.replace(".git", ""))
                     )
-        except:
+        except Exception:
             # Fallback to directory name
             repo_name = os.path.basename(os.getcwd())
 
@@ -147,7 +123,7 @@ Guidelines:
 Format your response as a complete commit message.
 """
 
-        # Request commit message from Ollama
+        # Request commit message from the configured model
         response = api_request(
             endpoint="/text/generate",
             method="POST",
@@ -158,15 +134,13 @@ Format your response as a complete commit message.
                 "stream": not no_stream,
                 "show_thinking": show_thinking,
             },
-            loading_message=f"Generating commit message with {model}...",
-            use_local_model=use_local,
-            local_model_name=model,
+            model_name=model,
         )
 
         if "error" in response:
-            print_error("Failed to generate commit message with Ollama.")
+            print_error("Failed to generate commit message.")
             # Fall back to simple generation
-            use_local = False
+            use_ai = False
         else:
             # Extract the commit message from the response
             commit_msg = response.get("text", "").strip()
@@ -197,7 +171,7 @@ Format your response as a complete commit message.
 
                 # Ask to use the message
                 if typer.confirm("Use this commit message?"):
-                    result = _run_git_command(["git", "commit", "-m", commit_msg])
+                    result = run_git_command(["git", "commit", "-m", commit_msg])
                     print(result)
                 return
             else:
@@ -219,12 +193,12 @@ Format your response as a complete commit message.
 
                 # Ask to use the message
                 if typer.confirm("Use this commit message?"):
-                    result = _run_git_command(["git", "commit", "-m", commit_msg])
+                    result = run_git_command(["git", "commit", "-m", commit_msg])
                     print(result)
                 return
 
-    # Fallback to simple generation if not using Ollama or if Ollama fails
-    if not use_local:
+    # Fallback to simple generation if no AI provider is configured or the call failed
+    if not use_ai:
         # Generate the commit message
         if message_type == "conventional":
             # Mock conventional commit message
@@ -274,17 +248,14 @@ Format your response as a complete commit message.
 
         # Ask to use the message
         if typer.confirm("Use this commit message?"):
-            result = _run_git_command(["git", "commit", "-m", msg])
+            result = run_git_command(["git", "commit", "-m", msg])
             print(result)
 
 
 @app.command()
 def pr_description(
-    use_local: bool = typer.Option(
-        True, "--local/--api", help="Use local AI model instead of API backend"
-    ),
-    model: str = typer.Option(
-        "deepseek-r1: 7b", "--model", "-m", help="Specify which local model to use"
+    model: Optional[str] = typer.Option(
+        None, "--model", "-m", help="Model to use (defaults to the configured default)"
     ),
     no_stream: bool = typer.Option(
         False, "--no-stream", help="Disable streaming for local models"
@@ -299,12 +270,12 @@ def pr_description(
     # Get commits that would be included in a PR
     try:
         main_branch = "main"
-        if not _run_git_command(
+        if not run_git_command(
             ["git", "show-ref", "--verify", "--quiet", f"refs/heads/{main_branch}"]
         ):
             main_branch = "master"
 
-        commits = _run_git_command(
+        commits = run_git_command(
             ["git", "log", f"{main_branch}..HEAD", "--pretty=format: %s"]
         )
 
@@ -312,42 +283,29 @@ def pr_description(
             print_error("No commits found between current branch and main/master.")
             return
 
-        # Check Ollama availability for local model usage
+        available_models = list_available_models()
+        use_ai = bool(available_models)
+        if use_ai and model and model not in available_models:
+            print_warning(
+                f"Model '{model}' not found. Available models: {', '.join(available_models)}"
+            )
+            model = available_models[0]
+            print_info(f"Using {model} instead.")
 
-        if use_local:
-            local_models = get_available_local_models()
-            if not local_models:
-                print_warning(
-                    "No local models found in Ollama. Falling back to simple generation."
-                )
-                use_local = False
-            elif model not in local_models:
-                print_warning(
-                    f"Model '{model}' not found. Available models: {', '.join(local_models)}"
-                )
-                if "deepseek-r1: 7b" in local_models:
-                    model = "deepseek-r1: 7b"
-                    print_info("Using deepseek-r1: 7b instead.")
-                else:
-                    model = local_models[0]
-                    print_info(f"Using {model} instead.")
-
-        if use_local:
+        if use_ai:
             # Get more detailed information for better PR descriptions
             # Get the branch name
-            branch = _run_git_command(
+            branch = run_git_command(
                 ["git", "rev-parse", "--abbrev-ref", "HEAD"]
             ).strip()
 
             # Get more detailed commit info
-            detailed_commits = _run_git_command(
+            detailed_commits = run_git_command(
                 ["git", "log", f"{main_branch}..HEAD", "--pretty=format: %h %s%n%b"]
             )
 
             # Get a summary of changes
-            summary = _run_git_command(
-                ["git", "diff", f"{main_branch}..HEAD", "--stat"]
-            )
+            summary = run_git_command(["git", "diff", f"{main_branch}..HEAD", "--stat"])
 
             # Create a prompt for the PR description
             pr_prompt = f"""Generate a comprehensive pull request description for the following changes in branch '{branch}'.
@@ -369,7 +327,7 @@ Guidelines for a good PR description:
 Format the PR description in Markdown with appropriate headings, bullet points, and sections.
 """
 
-            # Request PR description from Ollama
+            # Request PR description from the configured model
             response = api_request(
                 endpoint="/text/generate",
                 method="POST",
@@ -380,15 +338,13 @@ Format the PR description in Markdown with appropriate headings, bullet points, 
                     "stream": not no_stream,
                     "show_thinking": show_thinking,
                 },
-                loading_message=f"Generating PR description with {model}...",
-                use_local_model=use_local,
-                local_model_name=model,
+                model_name=model,
             )
 
             if "error" in response:
-                print_error("Failed to generate PR description with Ollama.")
+                print_error("Failed to generate PR description.")
                 # Fall back to simple generation
-                use_local = False
+                use_ai = False
             else:
                 # Extract the PR description from the response
                 pr_desc = response.get("text", "").strip()
@@ -439,12 +395,12 @@ Format the PR description in Markdown with appropriate headings, bullet points, 
                             print(panel)
                     return
 
-        # Fallback to simple generation if not using Ollama or if Ollama fails
-        if not use_local:
+        # Fallback to simple generation if no AI provider is configured or the call failed
+        if not use_ai:
             print("Based on your commits, here's a suggested PR description: \n")
 
             # Generate title from branch name
-            branch = _run_git_command(
+            branch = run_git_command(
                 ["git", "rev-parse", "--abbrev-ref", "HEAD"]
             ).strip()
             title = branch.replace("-", " ").replace("_", " ").title()

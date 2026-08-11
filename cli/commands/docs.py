@@ -7,7 +7,7 @@ import typer
 from rich import print
 from rich.panel import Panel
 
-from cli.utils.api import api_request, get_available_local_models
+from cli.utils.api import api_request, list_available_models
 from cli.utils.formatting import print_error, print_info, print_success, print_warning
 
 app = typer.Typer(help="Search and summarize documentation")
@@ -41,11 +41,8 @@ def search(
     max_results: int = typer.Option(
         5, "--max", "-m", help="Maximum number of results to display"
     ),
-    use_local: bool = typer.Option(
-        True, "--local/--api", help="Use local AI model instead of API backend"
-    ),
-    model: str = typer.Option(
-        "deepseek-r1: 7b", "--model", "-m", help="Specify which local model to use"
+    model: Optional[str] = typer.Option(
+        None, "--model", help="Model to use (defaults to the configured default)"
     ),
     no_stream: bool = typer.Option(
         False, "--no-stream", help="Disable streaming for local models"
@@ -60,25 +57,16 @@ def search(
     search_terms = " ".join(query).lower()
     print(f"Searching docs for: {search_terms}")
 
-    # Check Ollama availability for local model usage
+    available_models = list_available_models()
+    use_ai = bool(available_models)
+    if use_ai and model and model not in available_models:
+        print_warning(
+            f"Model '{model}' not found. Available models: {', '.join(available_models)}"
+        )
+        model = available_models[0]
+        print_info(f"Using {model} instead.")
 
-    if use_local:
-        local_models = get_available_local_models()
-        if not local_models:
-            print_warning("No local models available. Falling back to simple search.")
-            use_local = False
-        elif model not in local_models:
-            print_warning(
-                f"Model '{model}' not found. Available models: {', '.join(local_models)}"
-            )
-            if "deepseek-r1: 7b" in local_models:
-                model = "deepseek-r1: 7b"
-                print_info("Using deepseek-r1: 7b instead.")
-            else:
-                model = local_models[0]
-                print_info(f"Using {model} instead.")
-
-    if use_local:
+    if use_ai:
         # Prepare documentation search prompt
         language_filter = f" for {language}" if language else ""
         search_prompt = f"""You are a documentation search engine.
@@ -94,7 +82,7 @@ Each result should include:
 Format the results in a clean, numbered list with clear headings for each item.
 """
 
-        # Request documentation search from Ollama
+        # Request documentation search from the configured model
         response = api_request(
             endpoint="/text/generate",
             method="POST",
@@ -105,15 +93,13 @@ Format the results in a clean, numbered list with clear headings for each item.
                 "stream": not no_stream,
                 "show_thinking": show_thinking,
             },
-            loading_message=f"Searching documentation with {model}...",
-            use_local_model=use_local,
-            local_model_name=model,
+            model_name=model,
         )
 
         if "error" in response:
             print_error("Failed to search documentation.")
             # Fall back to simple search
-            use_local = False
+            use_ai = False
         else:
             # For streaming mode, we need to handle the final output differently
             if not no_stream:
@@ -158,8 +144,8 @@ Format the results in a clean, numbered list with clear headings for each item.
                         print(panel)
                 return
 
-    # Fallback to simple search if not using Ollama or if Ollama fails
-    if not use_local:
+    # Fallback to simple search if no AI provider is configured or the call failed
+    if not use_ai:
         results: List[Tuple[str, str, str]] = []
 
         # Filter by language if provided
@@ -195,11 +181,8 @@ Format the results in a clean, numbered list with clear headings for each item.
 def summarize(
     file_path: str = typer.Argument(..., help="Documentation file to summarize"),
     length: str = typer.Option("medium", help="Summary length (short, medium, long)"),
-    use_local: bool = typer.Option(
-        True, "--local/--api", help="Use local AI model instead of API backend"
-    ),
-    model: str = typer.Option(
-        "deepseek-r1: 7b", "--model", "-m", help="Specify which local model to use"
+    model: Optional[str] = typer.Option(
+        None, "--model", "-m", help="Model to use (defaults to the configured default)"
     ),
     no_stream: bool = typer.Option(
         False, "--no-stream", help="Disable streaming for local models"
@@ -219,27 +202,16 @@ def summarize(
         with open(file_path, "r") as f:
             content = f.read()
 
-        # Check Ollama availability for local model usage
+        available_models = list_available_models()
+        use_ai = bool(available_models)
+        if use_ai and model and model not in available_models:
+            print_warning(
+                f"Model '{model}' not found. Available models: {', '.join(available_models)}"
+            )
+            model = available_models[0]
+            print_info(f"Using {model} instead.")
 
-        if use_local:
-            local_models = get_available_local_models()
-            if not local_models:
-                print_warning(
-                    "No local models available. Falling back to simple summarization."
-                )
-                use_local = False
-            elif model not in local_models:
-                print_warning(
-                    f"Model '{model}' not found. Available models: {', '.join(local_models)}"
-                )
-                if "deepseek-r1: 7b" in local_models:
-                    model = "deepseek-r1: 7b"
-                    print_info("Using deepseek-r1: 7b instead.")
-                else:
-                    model = local_models[0]
-                    print_info(f"Using {model} instead.")
-
-        if use_local:
+        if use_ai:
             # Determine the target length
             if length == "short":
                 length_instruction = "Create a concise summary in about 2-3 sentences."
@@ -277,7 +249,7 @@ Here's the content to summarize:
 {truncation_warning}
 """
 
-            # Request summarization from Ollama
+            # Request summarization from the configured model
             response = api_request(
                 endpoint="/text/generate",
                 method="POST",
@@ -288,15 +260,13 @@ Here's the content to summarize:
                     "stream": not no_stream,
                     "show_thinking": show_thinking,
                 },
-                loading_message=f"Summarizing with {model}...",
-                use_local_model=use_local,
-                local_model_name=model,
+                model_name=model,
             )
 
             if "error" in response:
-                print_error("Failed to summarize with Ollama.")
+                print_error("Failed to summarize.")
                 # Fall back to simple summarization
-                use_local = False
+                use_ai = False
             else:
                 print(f"\n[bold green]Summary of {file_path} ({length}): [/bold green]")
 
@@ -346,8 +316,8 @@ Here's the content to summarize:
                             print(panel)
                     return
 
-        # Fallback to simple summarization if not using Ollama or if Ollama fails
-        if not use_local:
+        # Fallback to simple summarization if no AI provider is configured or the call failed
+        if not use_ai:
             # Calculate summary length
             content_length = len(content)
             if length == "short":

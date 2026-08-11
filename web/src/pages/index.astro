@@ -83,8 +83,7 @@ import Layout from "../layouts/Layout.astro";
         <p class="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed">
           Generate code, suggest terminal commands, search docs, assist with
           Git, and test APIs —
-          <span class="text-indigo-400 font-semibold">all running locally</span>
-          using Ollama's LLM models.
+          <span class="text-indigo-400 font-semibold">using the AI provider you already have</span>.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -305,8 +304,8 @@ import Layout from "../layouts/Layout.astro";
           </div>
           <h3 class="text-xl font-bold mb-2 text-white">API Testing</h3>
           <p class="text-slate-400">
-            Test and format API requests easily with built-in Ollama
-            integration.
+            Test and format API requests easily with your configured AI
+            provider.
           </p>
           <div
             class="mt-4 font-mono text-xs text-orange-300 bg-slate-900 p-2 rounded"
@@ -336,15 +335,15 @@ import Layout from "../layouts/Layout.astro";
               ></path>
             </svg>
           </div>
-          <h3 class="text-xl font-bold mb-2 text-white">100% Private</h3>
+          <h3 class="text-xl font-bold mb-2 text-white">Bring Your Own Provider</h3>
           <p class="text-slate-400">
-            All processing happens locally on your machine. No data leaves your
-            computer.
+            Use the AI provider you already have an API key for. No new
+            accounts, no vendor lock-in.
           </p>
           <div
             class="mt-4 font-mono text-xs text-pink-300 bg-slate-900 p-2 rounded"
           >
-            Powered by Ollama
+            Anthropic · OpenAI
           </div>
         </div>
       </div>
@@ -377,18 +376,8 @@ import Layout from "../layouts/Layout.astro";
                 Install Prerequisites
               </h3>
               <p class="text-slate-400 mb-4">
-                First, make sure you have Python 3.8+ and Ollama installed:
+                First, make sure you have Python 3.8+ and Git installed.
               </p>
-              <div class="bg-slate-900 rounded-lg p-4 border border-slate-700">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-sm text-slate-400 font-mono"
-                    >Install Ollama</span
-                  >
-                </div>
-                <code class="text-sm text-indigo-300 font-mono">
-                  # Download from https://ollama.ai
-                </code>
-              </div>
             </div>
           </div>
         </div>
@@ -437,18 +426,22 @@ import Layout from "../layouts/Layout.astro";
             </div>
             <div class="flex-1">
               <h3 class="text-2xl font-bold mb-3 text-white">
-                Download AI Model
+                Configure Your Provider
               </h3>
               <p class="text-slate-400 mb-4">
-                Pull the recommended DeepSeek model:
+                Export an API key for the provider you want to use:
               </p>
               <div class="bg-slate-900 rounded-lg p-4 border border-slate-700">
-                <code class="text-sm text-indigo-300 font-mono">
-                  ollama pull deepseek-r1:7b
+                <code class="text-sm text-indigo-300 font-mono block mb-2">
+                  export ANTHROPIC_API_KEY="..."
+                </code>
+                <code class="text-sm text-indigo-300 font-mono block">
+                  export OPENAI_API_KEY="..."
                 </code>
               </div>
               <p class="text-slate-400 mt-4 text-sm">
-                Other supported models: llama2:7b, mistral:7b, codellama, etc.
+                aidev detects whichever key you've set and lets you pick a
+                model from that provider.
               </p>
             </div>
           </div>
@@ -720,9 +713,9 @@ import Layout from "../layouts/Layout.astro";
           <h3
             class="text-xl font-bold mb-2 text-white group-hover:text-purple-400 transition-colors"
           >
-            Ollama Integration
+            Provider Setup
           </h3>
-          <p class="text-slate-400">Detailed guide on using Ollama models</p>
+          <p class="text-slate-400">Guide to configuring Anthropic and OpenAI</p>
         </a>
 
         <a
@@ -851,7 +844,7 @@ import Layout from "../layouts/Layout.astro";
             </li>
             <li>
               <a href="#" class="hover:text-indigo-400 transition-colors"
-                >Ollama Setup</a
+                >Provider Setup</a
               >
             </li>
             <li>

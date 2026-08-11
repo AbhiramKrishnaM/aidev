@@ -1,13 +1,13 @@
 """Terminal command suggestions and explanations."""
 
-from typing import List
+from typing import List, Optional
 
 import typer
 from rich import print
 from rich.console import Console
 from rich.panel import Panel
 
-from cli.utils.api import api_request, get_available_local_models
+from cli.utils.api import api_request, list_available_models
 from cli.utils.formatting import print_error, print_info, print_success, print_warning
 
 app = typer.Typer(help="Get help with terminal commands")
@@ -20,11 +20,8 @@ def suggest(
     platform: str = typer.Option(
         "auto", help="Platform (linux, mac, windows, or auto)"
     ),
-    use_local: bool = typer.Option(
-        True, "--local/--api", help="Use local AI model instead of API backend"
-    ),
-    model: str = typer.Option(
-        "deepseek-r1: 7b", "--model", "-m", help="Specify which local model to use"
+    model: Optional[str] = typer.Option(
+        None, "--model", "-m", help="Model to use (defaults to the configured default)"
     ),
     no_stream: bool = typer.Option(
         False, "--no-stream", help="Disable streaming for local models"
@@ -51,21 +48,15 @@ def suggest(
 
     print(f"Suggesting commands for '{description}' on {platform}:")
 
-    if use_local:
-        local_models = get_available_local_models()
-        if not local_models:
-            print_warning("No local models available. Falling back to API backend.")
-            use_local = False
-        elif model not in local_models:
-            print_warning(
-                f"Model '{model}' not found. Available models: {', '.join(local_models)}"
-            )
-            if "deepseek-r1: 7b" in local_models:
-                model = "deepseek-r1: 7b"
-                print_info("Using deepseek-r1: 7b instead.")
-            else:
-                model = local_models[0]
-                print_info(f"Using {model} instead.")
+    available_models = list_available_models()
+    if not available_models:
+        print_warning("No AI provider configured. Falling back to mock suggestions.")
+    elif model and model not in available_models:
+        print_warning(
+            f"Model '{model}' not found. Available models: {', '.join(available_models)}"
+        )
+        model = available_models[0]
+        print_info(f"Using {model} instead.")
 
     # Request command suggestions from the API
     response = api_request(
@@ -78,9 +69,7 @@ def suggest(
             "stream": not no_stream,
             "show_thinking": show_thinking,
         },
-        loading_message=f"Finding terminal commands for {platform}...",
-        use_local_model=use_local,
-        local_model_name=model,
+        model_name=model,
     )
 
     if "error" in response:
@@ -107,7 +96,7 @@ def suggest(
     else:
         # For streaming mode, the text is already printed in real-time
         # We only need to print a closing line
-        if use_local and not no_stream:
+        if not no_stream:
             # Already displayed in real-time
             print("\n")  # Add extra newline for separation
             print_success(
@@ -133,11 +122,7 @@ def suggest(
         else:
             # Display the AI-generated suggestions for non-streaming mode
             suggestions = response.get("text", "No suggestions generated")
-            model_info = (
-                f" (using {response.get('model_used', 'unknown model')})"
-                if use_local
-                else ""
-            )
+            model_info = f" (using {response.get('model_used', 'unknown model')})"
             print(f"\n[bold green]Suggested Commands{model_info}: [/bold green]")
             print(suggestions)
 
@@ -157,11 +142,8 @@ def suggest(
 @app.command()
 def explain(
     command: List[str] = typer.Argument(..., help="Command to explain"),
-    use_local: bool = typer.Option(
-        True, "--local/--api", help="Use local AI model instead of API backend"
-    ),
-    model: str = typer.Option(
-        "deepseek-r1: 7b", "--model", "-m", help="Specify which local model to use"
+    model: Optional[str] = typer.Option(
+        None, "--model", "-m", help="Model to use (defaults to the configured default)"
     ),
     no_stream: bool = typer.Option(
         False, "--no-stream", help="Disable streaming for local models"
@@ -176,21 +158,15 @@ def explain(
     full_command = " ".join(command)
     print(f"Explaining command: [bold]{full_command}[/bold]")
 
-    if use_local:
-        local_models = get_available_local_models()
-        if not local_models:
-            print_warning("No local models available. Falling back to API backend.")
-            use_local = False
-        elif model not in local_models:
-            print_warning(
-                f"Model '{model}' not found. Available models: {', '.join(local_models)}"
-            )
-            if "deepseek-r1: 7b" in local_models:
-                model = "deepseek-r1: 7b"
-                print_info("Using deepseek-r1: 7b instead.")
-            else:
-                model = local_models[0]
-                print_info(f"Using {model} instead.")
+    available_models = list_available_models()
+    if not available_models:
+        print_warning("No AI provider configured. Falling back to mock explanations.")
+    elif model and model not in available_models:
+        print_warning(
+            f"Model '{model}' not found. Available models: {', '.join(available_models)}"
+        )
+        model = available_models[0]
+        print_info(f"Using {model} instead.")
 
     # Request command explanation from the API
     response = api_request(
@@ -203,9 +179,7 @@ def explain(
             "stream": not no_stream,
             "show_thinking": show_thinking,
         },
-        loading_message="Analyzing command...",
-        use_local_model=use_local,
-        local_model_name=model,
+        model_name=model,
     )
 
     if "error" in response:
@@ -230,7 +204,7 @@ def explain(
             )
     else:
         # For streaming mode, the text is already printed in real-time
-        if use_local and not no_stream:
+        if not no_stream:
             # Already displayed in real-time
             print("\n")  # Add extra newline for separation
             print_success(
@@ -256,11 +230,7 @@ def explain(
         else:
             # Display the AI-generated explanation for non-streaming mode
             explanation = response.get("text", "No explanation generated")
-            model_info = (
-                f" (using {response.get('model_used', 'unknown model')})"
-                if use_local
-                else ""
-            )
+            model_info = f" (using {response.get('model_used', 'unknown model')})"
             print(f"\n[bold green]Command Explanation{model_info}: [/bold green]")
             print(explanation)
 
@@ -275,24 +245,3 @@ def explain(
                         border_style="blue",
                     )
                     print(panel)
-
-
-@app.command()
-def models() -> None:
-    """List available AI models for terminal commands."""
-    local_models = get_available_local_models()
-
-    if not local_models:
-        print_warning("No local AI models available.")
-        print("You can install Ollama and pull a compatible model like:")
-        print("  1. Install Ollama from https: //ollama.ai")
-        print("  2. Run: ollama pull deepseek-r1: 7b")
-        return
-
-    print("[bold green]Available AI Models: [/bold green]")
-    for model in local_models:
-        print(f"- {model}")
-
-    print("\nTo use a specific model:")
-    print('aidev terminal suggest --model MODEL_NAME "find large files"')
-    print("aidev terminal explain --model MODEL_NAME ls -la")
